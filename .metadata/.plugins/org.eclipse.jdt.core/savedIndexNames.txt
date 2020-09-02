@@ -1,0 +1,2 @@
+INDEX VERSION 1.131+C:\Users\sgangal2\OneDrive - DXC Production\Desktop\dxc\Spring basics\.metadata\.plugins\org.eclipse.jdt.core
+3877962828.index
