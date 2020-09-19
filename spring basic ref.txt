@@ -1,0 +1,423 @@
+					SPRING INVERSION OF CONTROLL
+1.spring container
+  primary function of the spring container
+  1. create and manage objects(Inversion of control)
+  2. inject object dependencies(dependency Injection)
+
+2. configure spring container
+   1.XML configration file(legacy but mostly legacy apps still use this)
+   2.java annotations(modern)
+   3.java source code(modern)
+
+3.Spring Development process
+  1.configure your spring beans
+  2.create a spring container
+  3.Retrieve Beans from spring container
+----------------------------------------------------------------------------------
+  step1:configure your spring beans(ApplicationContext.xml)
+  File: ApplicationContext.xml
+		<beans>
+			<bean id=myClassName class="fully qualified class name">
+			</bean>
+		</beans>
+  2.create a spring container
+  File:
+	 create a spring container
+	-->Spring container is is also know as the Application context
+	-->implementation of ApplicationContext
+		1.ClassPathXmlApplicationContext
+		2.AnnotationConfigApplicationContext
+		3.GenericWebApplication  Context .. etc
+	HOW TO?
+	_________
+	ClassPathXmlApplicationContext context=
+		new ClassPathXmlApplicationContext("applicationContext.xml");
+   3.Retrieve Beans from spring container
+
+	ClassName ref=context.getBean("id name".ClassName.class);
+--------------------------------------------------------------------------------
+	Know More:
+	1.FAQ: What is a Spring Bean?
+
+	-->A "Spring Bean" is simply a Java object.
+
+	-->When Java objects are created by the Spring Container, then Spring refers to them
+			 as "Spring Beans".
+	-->Spring Beans are created from normal Java classes .... just like Java objects.
+----------------------------------------------------------------------------------------------
+File :ApplicationContext
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+	
+    <!-- Define your beans here -->
+    
+    <!-- define the dependency -->
+    <bean id="myFortuneService"
+    		class="com.luv2code.springdemo.HappyFortuneService">
+    	</bean>
+    
+ 	<bean id="myCoach"
+ 		class="com.luv2code.springdemo.TrackCoach">	 		
+ 	</bean>
+
+    <!--
+    <bean id="myCoach"
+        class="com.luv2code.springdemo.BaseballCoach">         
+    </bean>
+    -->
+</beans>
+============================================================================================================================================================
+				SPRING DEPENDENCY INJECTION
+  1.Dependency inversion principle:
+	the client delegates  to call the another object to provide its the dependency				
+			
+  Injection types:
+	1.Constructor Injection
+	2.Setter Injection
+  also Autowiring 
+
+1.Constructor Injection::if you want to inject the bean with the help of the constructor then 
+	define the bean for the object to be injected and 
+
+	<bean id="userService" class="com.package name">
+  	then, define the bean for the the object in which the bean is to be injected and
+    i.e <bean id="controller" class="fully qualified class name"
+
+		<constructor-arg ref="userService"/>
+	</bean>
+---------------------------------------------------------------------------------------
+2. Setter injection::if you want to inject the bean with the help of the setter then 
+	define the bean for the object to be injected and 
+	(create the no args constructor)
+        <bean id="userService" class="com.package name">
+<bean id="controller" class="fully qualified class name"
+	<property  name="userService ref="bean id"/>				-->userService
+	it will look for thr setUserService(); and pass in the value		--> setUserService() willbe called
+	</bean>
+---------------------------------------------------------------------------------------
+				INJECTING THE LITERAL VALUES
+1. create the setter methods
+2.set up the configration
+  ex: private String name;
+      private int roll;
+
+	public void setName()...
+	public void setRoll()...
+
+ 	configration:
+		define a bean where you want to inject these values
+		<bean id ="userService" class="fully qualified class name">
+			<property name=" name" value="sharat">
+			<property name=" roll" value="10">
+		</bean>
+----------------------------------------------------------------------------------------
+				INJECTING THE LITERAL VALUES(but from properties file)
+1.create the property file--- > inside the src folder
+2.load the properties file to the spring config
+3.reference vlues from the properties file.
+
+1--> inside the file : anyname.name=sharat
+	anyname.roll=12
+2--> in the xml
+	<context.property-placeholder location="classpath:anyname.properties"/>
+3-->in xml 
+	while defining the bean 
+	<bean id ="userService" class="fully qualified class name">
+			<property name=" name" value="${anyname.name}"/>
+			<property name=" roll" value="${anyname.roll}"/>
+		</bean>
+============================================================================================================================================================
+
+
+
+
+
+
+						BEAN SCOPE
+1.bean scope:scope refers to the life cycle of the bean
+2.how long does the bean live
+3.how many instance created 
+4.how the bean shared
+
+
+  the default scope is => singleton
+    that means  spring container creates only one instance of the bean, 
+	by default
+  it is cached in memory
+  all requests for the bean will share the same bean
+  there are various scopes such as: 
+
+  *singleton:create the single shared instance of the bean
+  *prototype:creates a new bean instance for each request
+  *request:scoped to http web request use for web apps
+  *session:scoped to http web session use for web apps
+  *global-session:scoped to http web gloabal session use for web apps
+	-------------	----------------	-------------------
+ ex:<bean id ="userService" class="fully qualified class name" scope="singleton"></bean>
+ -------------------------------------------------------------------------------------------------
+					BEAN  LIFECYCLE
+1.you can add custom code during "bean initialization"
+2.calling custom business logic methods
+3.setting up handles to resources (db, sockets,file etc)
+
+1.you can add custom code during "bean Destruction"
+2.calling custom business logic methods
+3.clean up handles to resources (db, sockets,file etc)
+
+In XML file----> for init method
+ ex: <bean id="myCoach"
+        class="com.luv2code.springdemo.BaseballCoach" init-method="doMyStuffMethod">         
+     </bean>  here , doMyStuffMethod() will be called when the initiaization of the bean class
+    
+ ex: <bean id="myCoach"
+        class="com.luv2code.springdemo.BaseballCoach" destroy-method="doMyCleanUpStuffMethod">         
+     </bean>  here , doMyCleanUpStuffMethod() will be called when the destruction of the bean class
+NOTE:these method should be present in the bean class as defined in xml
+=================================================================================================
+		SPRING CONFIGRATION WITH JAVA ANNOTATION
+1. what are java annotation
+   * they are sepcial lables/markers added to java class 
+   *provide the metadata about the class
+   *processed at compile time or run time for special processing
+2. what is component scan 
+   * spring will scan for the specified package for special annotation
+   * it will automatically registers the bean in the spring container
+
+		Development process
+	step 1: Enable component scanning
+	step 2:add the @Component annotation to your java class
+	step 3: retrive the bean from the spring container
+
+-----------------		-------------------------	-----------------------
+step1:XML file
+    ___________ <beans>
+		    <context:component-scan base-package="packages you wan to scan">
+		</beans>
+
+step2: we will  add the @Component("theBeanId")----> explicity mentionting the bean id
+       on the class that we want to register
+
+step3:context.getBean("theBeanId" className.class);
+
+	if you use the annotatio there is no need to add the bean in the xml, We just
+	 have add the component scan 
+in main app  class::
+	ClassPathXmlApplicationContext context= new ClassPathXmlApplicationContext();
+
+----------------------------------------------------------------------------------------
+@Componet("beanId")--> if you dont want to specify the BeanId then 
+ you can just specify the annotation @Component
+   ex: for class--> TennisCoach----> defult bean id is---> tennisCoach
+   
+   Retriving the bean from the spring container
+   context.getBean("tennisCoach", TennisCoach.class);
+
+  	The default bean id is the decapitalized bean id
+=============================================================================================
+
+
+
+		Spring Dependency injection using annotation and Autowire
+1. what is Spring autowiring
+   .for dependency injection spring can use auto wiring 
+   .spring will look for a class tha matches the property
+   .matches by type: class or interface
+   .spring will inject it automatically hence it is autowired
+2. this is achived by 
+      1.component scan
+      2.if the bean is decorated with @component then that bean will be registered 
+      3. if any class is autowired for such class then spring will inject those class to 
+	 the specified contructor or setter of field
+
+		for constructor injection
+	S1. define the dependency interface and class
+	S2. create a contructor in your class for injections
+	S3. configure the dependency injection with @Autowired annotation
+
+		
+	Step 1: create the constructor for the dependency injection
+	Step 2: write @AutoWired on top of the constructor
+	Step 3:
+
+--------------------------------------------------------------------------------------
+		Setter injection
+	define the private variables that you want to it be injected
+	Same as above but just add @autowired on Setter method
+			Or 
+		Method Injection 
+	same as above insted of the setter or constructor
+	just write the any methods and mention the @Autowired on the method (same as setter method)
+			OR
+		Field Injection
+	this is possible by java reflection
+	Just mention the @Autowired on the filed even on private field
+--------------------------------------------------------------------------------------
+	for now our interface implimenting the one class 
+	now if our interface has many implemention if you dont mention the unique beanId then
+		you will get a error classed no unique bean recogised
+
+ex:	so Whenever you write the @Autowired
+	you write the 		  @Qualifier("uniqueBeanId")----->"..." decapitaized class name
+				private MyClass myClass;
+
+ 	it can be used for any of the injection method
+NOTE : if the class name is RESTController then the qualifier name is not decapitaized i.e
+			REStController--->REStController
+	if first two charectors of the class are same then the qualifier name is not changed
+
+
+			For Construtor the syntax is slightly changed
+	    @Autowired
+    public TennisCoach(@Qualifier("randomFortuneService") FortuneService theFortuneService) {
+
+        System.out.println(">> TennisCoach: inside constructor using @autowired and @qualifier");
+        
+        fortuneService = theFortuneService;
+    }
+
+============================================================================================================================================================
+				BEAN SCOPE
+  on the class 
+	@Component("beanId")
+	@Scope("Singleton")		// @Scope("Prototype")
+	public class MainClass
+		{
+		   .......
+		   .......
+		}
+ 
+ 
+ 	Special Note about @PostConstruct and @PreDestroy Method Signatures
+Special Note about @PostConstruct and @PreDestroy Method Signatures
+
+I want to provide additional details regarding the method signatures of @PostContruct 
+and @PreDestroy methods.
+
+Access modifier:
+The method can have any access modifier (public, protected, private)
+
+Return type:
+The method can have any return type. However, "void' is most commonly used. If you give a
+return type just note that you will not be able to capture the return value. As a result,
+"void" is commonly used.
+
+Method name:
+The method can have any method name.
+
+Arguments:
+The method can not accept any arguments. The method should be no-arg.
+
+================================================================================
+ For "prototype" scoped beans, Spring does not call the @PreDestroy method.  Gasp!  
+
+I didn't know this either until I dug through the Spring reference manual researching a student's question.
+
+Here is the answer from the Spring reference manual. Section 1.5.2
+
+https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html#beans-factory-scopes-prototype
+
+---         
+
+In contrast to the other scopes, Spring does not manage the complete lifecycle of a
+prototype bean: the container instantiates, configures, and otherwise assembles a
+prototype object, and hands it to the client, with no further record of that prototype
+instance.
+
+Thus, although initialization lifecycle callback methods are called on all objects
+regardless of scope, in the case of prototypes, configured destruction lifecycle callbacks 
+are not called. The client code must clean up prototype-scoped objects and release expensive 
+resources that the prototype bean(s) are holding. 
+
+To get the Spring container to release resources held by prototype-scoped beans, try using 
+a custom bean post-processor, which holds a reference to beans that need to be cleaned up.
+
+---
+This also applies to XML configuration.
+---
+
+QUESTION: How can I create code to call the destroy method on prototype scope beans
+ANSWER:
+
+You can destroy prototype beans but custom coding is required. This examples shows how to 
+destroy prototype scoped beans.
+
+1. Create a custom bean processor. This bean processor will keep track of prototype scoped beans. 
+During shutdown it will call the destroy() method on the prototype scoped beans.
+
+2. The prototype scoped beans MUST implement the DisposableBean interface. This interface defines a 
+"destroy()" method. This method should be used instead of the @PreDestroy annotation.
+
+3. In this app, BeanProcessorDemoApp.java is the main program. TennisCoach.java is the prototype 
+scoped bean. TennisCoach implements the DisposableBean interface and provides the destroy() method.
+ The custom bean processing 
+is handled in the MyCustomBeanProcessor class.
+
+See source code here for details: destroy-protoscope-bean-with-custom-processor.zip
+========================================================================================================================================================
+
+						SPRING CONFIGRATION WITH JAVA CODE
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	3 ways to do configration 
+		1.full xml configration
+		2.xml component scan
+		3.java configration class
+
+	Development proccess:
+		1.create a java class ans annotate as @Configration
+		2.add component scanning support @ComponentScan("base package")
+		3.read spring java configration class
+		4.retrive bean from spring container
+
+		3rd step: AnnotationConfigApplicationContext context=
+		  new AnnotationConfigApplicationContext("configration class name");
+		4th step :context.getBean("beanID" , BeanClass.class);
+=======================================================================================
+			defining spring bean with java code
+  1.deifine method to expose bean
+  2.inject bean dependency
+  3.read spring java configration
+  4.retrive bean from spring container
+
+INSIDE THE CONFIGRATION CLASS
+
+@Configuration
+public class SportsCoach
+{
+
+@Bean
+  public Coach SwimCoach()
+ {
+  SwimCoach mySwimCoach=new SwimCoach();
+  return mySwimCoach;
+ }
+
+}
+IMPORTANT :the method name will be registered as the bean Id	
+here, public Coach SwimCoach()----> swimCoach --> is bean id
+
+IF you declare the bean with @Bean then no component scan is requried.
+
+IF you are injecting dependency via constructor the you should also write 
+the bean declaration as such
+ex:
+@Bean
+  public FortuneService fortuneService()
+ {
+  return new HappyFortuneService();
+ }
+@Bean
+  public Coach SwimCoach()
+ {
+  SwimCoach mySwimCoach=new SwimCoach(fortuneService());
+  return mySwimCoach;
+ }
+----------------------------------------------------------------------------------------
